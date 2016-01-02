@@ -63,9 +63,15 @@ class NewVisitorTest(LiveServerTestCase):
 
 		# Heidi visits the home page. There is no sign of Marissa's lists
 		self.browser.get(self.live_server_url)
-		page_text = self.browser.find_element_by_tag_name('id_new_item')
+		page_text = self.browser.find_element_by_tag_name('body').text
 		self.assertNotIn('Buy plane tickets', page_text)
 		self.assertNotIn('Find Airbnb', page_text)
+
+
+		# Heidi starts a new list by entering a new item
+		inputBox = self.browser.find_element_by_id('id_new_item')
+		inputBox.send_keys('Buy new movie')
+		inputBox.send_keys(Keys.ENTER)
 
 		# Heidi gets her own unique URL
 		heidi_list_url = self.browser.current_url
