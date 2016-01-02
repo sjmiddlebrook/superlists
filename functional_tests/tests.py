@@ -36,12 +36,12 @@ class NewVisitorTest(LiveServerTestCase):
 		# She types "Buy plane tickets to Cartagena" into a text box
 		inputBox.send_keys('Buy plane tickets to Cartagena')
 
-		# When she hits enter, the page updates, and now the page lists
+		# When she hits enter, she is taken to a new URL, and now the page lists
 		# "1: Buy plane tickets to Cartagena" as an item in a to-do list
 		inputBox.send_keys(Keys.ENTER)
 
-		table = self.browser.find_element_by_id('id_list_table')
-		rows = table.find_elements_by_tag_name('tr')
+		marissa_list_url = self.browser.current_url
+		self.assertRegex(marissa_list_url, '/lists/.+')
 		self.check_for_row_in_list_table('1: Buy plane tickets to Cartagena')
 
 		# There is still a text box inviting her to add another item. She
@@ -51,18 +51,32 @@ class NewVisitorTest(LiveServerTestCase):
 		inputBox.send_keys(Keys.ENTER)
 
 		# The page updates again and now shows both items on her list
-		table = self.browser.find_element_by_id('id_list_table')
-		rows = table.find_elements_by_tag_name('tr')
 		self.check_for_row_in_list_table('1: Buy plane tickets to Cartagena')
 		self.check_for_row_in_list_table('2: Find Airbnb in Cartagena')
 		
-		# Marissa wonders whether the site will remember her list. Then
-		# she sees that the site has generated a unique URL for her --
-		# -- there is some explanatory text to that effect
-		self.fail('Finish the Test!')
+		# Now a new user, Heidi comes along to the site
 
-		# She visits that URL - her to-do list is still there
+		## We use a new browser session to make sure that no information
+		## of Marissa's is coming through from cookies etc
+		self.browser.quit()
+		self.browser = webdriver.Firefox()
 
-		# Satisfied she goes back to sleep
+		# Heidi visits the home page. There is no sign of Marissa's lists
+		self.browser.get(self.live_server_url)
+		page_text = self.browser.find_element_by_tag_name('id_new_item')
+		self.assertNotIn('Buy plane tickets', page_text)
+		self.assertNotIn('Find Airbnb', page_text)
+
+		# Heidi gets her own unique URL
+		heidi_list_url = self.browser.current_url
+		self.assertRegex(heidi_list_url, '/lists/.+')
+		self.assertNotEqual(heidi_list_url, marissa_list_url)
+
+		# Again there is no trace of Marissa's list
+		page_text = self.browser.find_element_by_tag_name('body').text
+		self.assertNotIn('Buy plane tickets', page_text)
+		self.assertNotIn('Find Airbnb', page_text)
+
+		# Satisfied, they go back to sleep
 
 
