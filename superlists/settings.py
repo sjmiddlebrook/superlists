@@ -23,9 +23,9 @@ BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 SECRET_KEY = '#%hvz^x#7eexqq@$zw$4mo)o#w1i-(654#+lkqwmalpdvld_=k'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['tdd-python-staging.investwemust.com']
 
 
 # Application definition
